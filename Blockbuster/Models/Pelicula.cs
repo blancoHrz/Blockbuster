@@ -12,7 +12,7 @@ namespace Blockbuster.Models
             public string Sinopsis { get; set; }
             public string Duracion { get; set; }
             public string Clasificacion { get; set; }
-            public byte[] Caratulao { get; set; }
+            public byte[] Caratula { get; set; }
         }
     }
 
