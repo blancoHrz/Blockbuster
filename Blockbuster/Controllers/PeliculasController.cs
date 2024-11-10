@@ -68,8 +68,8 @@ namespace Blockbuster.Controllers
                     throw;
                 }
             }
-
-            return NoContent();
+            return CreatedAtAction("GetAlumno", new { id = pelicula.idPelicula }, pelicula);
+            //return NoContent();
         }
 
         // POST: api/Peliculas
