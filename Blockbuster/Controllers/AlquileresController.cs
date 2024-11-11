@@ -11,27 +11,35 @@ namespace Blockbuster.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AlquilersController : ControllerBase
+    public class AlquileresController : ControllerBase
     {
         private readonly MyDbContext _context;
 
-        public AlquilersController(MyDbContext context)
+        public AlquileresController(MyDbContext context)
         {
             _context = context;
         }
 
-        // GET: api/Alquilers
+        // GET: api/Alquileres
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Alquiler>>> GetAlquiler()
+        public async Task<ActionResult<IEnumerable<Alquiler>>> GetAlquileres()
         {
-            return await _context.Alquiler.ToListAsync();
+            // Mantener tu lógica y agregar Include para las relaciones
+            return await _context.Alquileres
+                .Include(a => a.Cliente) // Relación con Cliente
+                .Include(a => a.Pelicula) // Relación con Película
+                .ToListAsync();
         }
 
-        // GET: api/Alquilers/5
+        // GET: api/Alquileres/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Alquiler>> GetAlquiler(int id)
         {
-            var alquiler = await _context.Alquiler.FindAsync(id);
+            // Mantener tu lógica y agregar Include para las relaciones
+            var alquiler = await _context.Alquileres
+                .Include(a => a.Cliente) // Relación con Cliente
+                .Include(a => a.Pelicula) // Relación con Película
+                .FirstOrDefaultAsync(a => a.idAlquiler == id);
 
             if (alquiler == null)
             {
@@ -41,8 +49,7 @@ namespace Blockbuster.Controllers
             return alquiler;
         }
 
-        // PUT: api/Alquilers/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        // PUT: api/Alquileres/5
         [HttpPut("{id}")]
         public async Task<IActionResult> PutAlquiler(int id, Alquiler alquiler)
         {
@@ -68,32 +75,31 @@ namespace Blockbuster.Controllers
                     throw;
                 }
             }
-
-            return NoContent();
+            return CreatedAtAction("GetCliente", new { id = alquiler.idAlquiler }, alquiler);
+            //return NoContent();
         }
 
-        // POST: api/Alquilers
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        // POST: api/Alquileres
         [HttpPost]
         public async Task<ActionResult<Alquiler>> PostAlquiler(Alquiler alquiler)
         {
-            _context.Alquiler.Add(alquiler);
+            _context.Alquileres.Add(alquiler);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetAlquiler", new { id = alquiler.idAlquiler }, alquiler);
         }
 
-        // DELETE: api/Alquilers/5
+        // DELETE: api/Alquileres/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAlquiler(int id)
         {
-            var alquiler = await _context.Alquiler.FindAsync(id);
+            var alquiler = await _context.Alquileres.FindAsync(id);
             if (alquiler == null)
             {
                 return NotFound();
             }
 
-            _context.Alquiler.Remove(alquiler);
+            _context.Alquileres.Remove(alquiler);
             await _context.SaveChangesAsync();
 
             return NoContent();
@@ -101,7 +107,7 @@ namespace Blockbuster.Controllers
 
         private bool AlquilerExists(int id)
         {
-            return _context.Alquiler.Any(e => e.idAlquiler == id);
+            return _context.Alquileres.Any(e => e.idAlquiler == id);
         }
     }
 }

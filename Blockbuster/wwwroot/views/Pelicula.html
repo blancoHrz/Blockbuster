@@ -11,19 +11,19 @@
         <div class="card-body">
             <div class="row p-1">
                 <div class="col-3 col-md-2">TITULO:</div>
-                <div class="col-9 col-md-8">
+                <div class="col-9 col-md-6">
                     <input type="text" class="form-control" id="txtTituloPelicula" name="txtTituloPelicula" required />
                 </div>
             </div>
             <div class="row p-1">
                 <div class="col-3 col-md-2">GENERO:</div>
-                <div class="col-9 col-md-4">
+                <div class="col-9 col-md-2">
                     <input type="text" class="form-control" id="txtGeneroPelicula" name="txtGeneroPelicula" required />
                 </div>
             </div>
             <div class="row p-1">
                 <div class="col-3 col-md-2">DIRECTOR:</div>
-                <div class="col-9 col-md-8">
+                <div class="col-9 col-md-6">
                     <input type="text" class="form-control" id="txtDirectorPelicula" name="txtDirectorPelicula" required />
                 </div>
             </div>
@@ -35,13 +35,13 @@
             </div>
             <div class="row p-1">
                 <div class="col-3 col-md-2">DURACION:</div>
-                <div class="col-9 col-md-4">
+                <div class="col-9 col-md-2">
                     <input type="text" class="form-control" id="txtDuracionPelicula" name="txtDuracionPelicula" required />
                 </div>
             </div>
             <div class="row p-1">
                 <div class="col-3 col-md-2">CLASIFICACION:</div>
-                <div class="col-9 col-md-4">
+                <div class="col-9 col-md-8">
                     <input type="text" class="form-control" id="txtClasificacionPelicula" name="txtClasificacionPelicula" required />
                 </div>
             </div>
@@ -54,7 +54,7 @@
                     </div>
                 </div>
                 <div class="col-3 col-md-2">
-                    <img height="10" src="" class="img-thumbnail rounded" alt="Caratula de la pelicula" id="imgMostrarCaratulaPelicula">
+                    <img height="20" src="" class="img-thumbnail rounded" alt="Caratula del pelicula" id="imgMostrarCaratulaPelicula">
                 </div>
             </div>
             <div class="row p-1">
@@ -86,43 +86,54 @@
     }
     frmPelicula.addEventListener('submit', e => {
         e.preventDefault();
-        guadarPeliculas();
+        guardarPeliculas();
     });
     frmPelicula.addEventListener('reset', e => {
         e.preventDefault();
         nuevoPeliculas();
     });
-    async function guadarPeliculas() {
-        let datos = {
-            titulo : txtTituloPelicula.value,
-            genero : txtGeneroPelicula.value,
-            director : txtDirectorPelicula.value,
-            sinopsis : txtSinopsisPelicula.value,
-            duracion : txtDuracionPelicula.value,
-            clasificacion : txtClasificacionPelicula.value,
-            caratula : archivo.split(',')[1] || null,
-        },
-            method = "POST",
-            url = 'https://localhost:7171/api/Peliculas';
-        if (frmPelicula.dataset.accion == "modificar") {
-            datos.idPelicula = frmPelicula.dataset.idpelicula;
-            method = "PUT";
-            url = `https://localhost:7171/api/Peliculas/${datos.idPelicula}`;
-        }
-        const respuesta = await fetch(url, {
-            method,
-            headers: {
-                "Content-Type": "application/json"
+    async function guardarPeliculas() {
+        try {
+            let datos = {
+                titulo: txtTituloPelicula.value,
+                genero: txtGeneroPelicula.value,
+                director: txtDirectorPelicula.value,
+                sinopsis: txtSinopsisPelicula.value,
+                duracion: txtDuracionPelicula.value,
+                clasificacion: txtClasificacionPelicula.value,
+                caratula: archivo.split(',')[1] || null,
             },
-            body: JSON.stringify(datos)
-        }), pelicula = await respuesta.json();
-        if (pelicula && pelicula?.idPelicula > 0) {
-            nuevoPeliculas();
-            listarPeliculas();
-        } else {
-            console.error(pelicula);
+                method = "POST",
+                url = 'https://localhost:7171/api/Peliculas';
+            if (frmPelicula.dataset.accion == "modificar") {
+                datos.idPelicula = frmPelicula.dataset.idpelicula;
+                method = "PUT";
+                url = `https://localhost:7171/api/Peliculas/${datos.idPelicula}`;
+            }
+            const respuesta = await fetch(url, {
+                method,
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(datos)
+            });
+
+            if (!respuesta.ok) {
+                throw new Error(`Error: ${respuesta.status} ${respuesta.statusText}`);
+            }
+
+            const pelicula = await respuesta.json();
+            if (pelicula && pelicula?.idPelicula > 0) {
+                nuevoPeliculas();
+                listarPeliculas();
+            } else {
+                console.error('No se pudo guardar la película.');
+            }
+        } catch (error) {
+            console.error('Hubo un problema con la operación fetch:', error);
         }
     }
+
     function modificarPelicula(pelicula) {
         frmPelicula.dataset.idpelicula = pelicula.idPelicula;
         frmPelicula.dataset.accion = "modificar";

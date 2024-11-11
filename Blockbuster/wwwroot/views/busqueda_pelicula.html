@@ -1,4 +1,4 @@
-﻿﻿<form id="frmBusquedaPelicula">
+﻿<form id="frmBusquedaPelicula">
     <div class="card text-bg-dark mb-3" style="width: 700px">
         <div class="card-header">
             <div class="d-flex">
@@ -27,10 +27,8 @@
     </div>
 </form>
 <script>
-    listarPeliculas();
-
     async function listarPeliculas() {
-        const respuesta = await fetch('/api/Peliculas'),
+        const respuesta = await fetch('https://localhost:7171/api/Peliculas'),
             peliculas = await respuesta.json();
         let filas = "";
         peliculas.forEach(pelicula => {
@@ -43,26 +41,30 @@
                     <td>${pelicula.duracion}</td>
                     <td>${pelicula.clasificacion}</td>
                     <td><button class="btn btn-danger" onClick='eliminarPelicula(${JSON.stringify(pelicula)}, event)'>DEL</button></td>
+                </tr>
             `;
         });
         $("#tblConsultaPeliculas > tbody > tr").remove();
         $("#tblConsultaPeliculas > tbody").append(filas);
     }
+
     async function eliminarPelicula(pelicula, e) {
         e.preventDefault();
 
         if (confirm(`Esta seguro de eliminar a ${pelicula.titulo.trim()}?`)) {
             const respuesta = await fetch(`https://localhost:7171/api/Peliculas/${pelicula.idPelicula}`, {
-                method:"DELETE",
+                method: "DELETE",
                 headers: {
                     "Content-Type": "application/text"
                 }
             }), datos = await respuesta.text();
             if (datos && datos.length > 0) {
-                consol.error(datos);
+                console.error(datos);
             } else {
                 listarPeliculas();
             }
         }
     }
+
+    listarPeliculas(); // Llama a listarPeliculas después de definir la función
 </script>

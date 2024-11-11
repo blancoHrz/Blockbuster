@@ -22,16 +22,16 @@ namespace Blockbuster.Controllers
 
         // GET: api/Clientes
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Cliente>>> GetCliente()
+        public async Task<ActionResult<IEnumerable<Cliente>>> GetClientes()
         {
-            return await _context.Cliente.ToListAsync();
+            return await _context.Clientes.ToListAsync();
         }
 
         // GET: api/Clientes/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Cliente>> GetCliente(int id)
         {
-            var cliente = await _context.Cliente.FindAsync(id);
+            var cliente = await _context.Clientes.FindAsync(id);
 
             if (cliente == null)
             {
@@ -68,8 +68,8 @@ namespace Blockbuster.Controllers
                     throw;
                 }
             }
-
-            return NoContent();
+            return CreatedAtAction("GetCliente", new { id = cliente.idCliente }, cliente);
+            //return NoContent();
         }
 
         // POST: api/Clientes
@@ -77,7 +77,7 @@ namespace Blockbuster.Controllers
         [HttpPost]
         public async Task<ActionResult<Cliente>> PostCliente(Cliente cliente)
         {
-            _context.Cliente.Add(cliente);
+            _context.Clientes.Add(cliente);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetCliente", new { id = cliente.idCliente }, cliente);
@@ -87,13 +87,13 @@ namespace Blockbuster.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCliente(int id)
         {
-            var cliente = await _context.Cliente.FindAsync(id);
+            var cliente = await _context.Clientes.FindAsync(id);
             if (cliente == null)
             {
                 return NotFound();
             }
 
-            _context.Cliente.Remove(cliente);
+            _context.Clientes.Remove(cliente);
             await _context.SaveChangesAsync();
 
             return NoContent();
@@ -101,7 +101,7 @@ namespace Blockbuster.Controllers
 
         private bool ClienteExists(int id)
         {
-            return _context.Cliente.Any(e => e.idCliente == id);
+            return _context.Clientes.Any(e => e.idCliente == id);
         }
     }
 }

@@ -3,16 +3,15 @@
 namespace Blockbuster.Models
 {
     public class Pelicula
-{
-            [Key]
-            public int idPelicula { get; set; }
-            public string Titulo { get; set; }
-            public string Genero { get; set; }
-            public string Director { get; set; }
-            public string Sinopsis { get; set; }
-            public string Duracion { get; set; }
-            public string Clasificacion { get; set; }
-            public byte[] Caratula { get; set; }
-        }
+    {
+        [Key]
+        public int idPelicula { get; set; }
+        public string titulo { get; set; }
+        public string genero { get; set; }
+        public string director { get; set; }
+        public string sinopsis { get; set; }
+        public string duracion { get; set; }
+        public string clasificacion { get; set; }
+        public byte[] caratula { get; set; }
     }
-
+}

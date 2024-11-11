@@ -1,0 +1,114 @@
+﻿<form id="frmCliente" data-idcliente="0" data-accion="nuevo">
+    <div class="card text-bg-dark mb-3" style="width: 800px">
+        <div class="card-header">
+            <div class="d-flex">
+                Registro de Cliente
+                <div class="ms-auto">
+                    <button type="button" data-form="clientes" class="btn-close btn-close-white"></button>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row p-1">
+                <div class="col-3 col-md-2">NOMBRE:</div>
+                <div class="col-9 col-md-6">
+                    <input type="text" class="form-control" id="txtNombreCliente" name="txtNombreCliente" required />
+                </div>
+            </div>
+            <div class="row p-1">
+                <div class="col-3 col-md-2">DUI:</div>
+                <div class="col-9 col-md-4">
+                    <input type="text" class="form-control" id="txtDuiCliente" name="txtDuiCliente" required />
+                </div>
+            </div>
+            <div class="row p-1">
+                <div class="col-3 col-md-2">EMAIL:</div>
+                <div class="col-9 col-md-6">
+                    <input type="email" class="form-control" id="txtEmailCliente" name="txtEmailCliente" required />
+                </div>
+            </div>
+            <div class="row p-1">
+                <div class="col-3 col-md-2">TELEFONO:</div>
+                <div class="col-9 col-md-4">
+                    <input type="text" class="form-control" id="txtTelefonoCliente" name="txtTelefonoCliente" required />
+                </div>
+            </div>
+            <div class="row p-1">
+                <div class="col-12 text-center">
+                    <input type="submit" class="btn btn-primary" value="Guardar" />
+                    <input type="reset" class="btn btn-warning" value="Nuevo" />
+                    <input type="button" onclick="abrirVentana('busqueda_cliente')" class="btn btn-success" value="Buscar" />
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<script>
+    frmCliente.addEventListener('submit', e => {
+        e.preventDefault();
+        guardarClientes();
+    });
+    frmCliente.addEventListener('reset', e => {
+        e.preventDefault();
+        nuevoClientes();
+    });
+
+    async function guardarClientes() {
+        try {
+            let datos = {
+                nombre: txtNombreCliente.value,
+                dui: txtDuiCliente.value,
+                email: txtEmailCliente.value,
+                telefono: txtTelefonoCliente.value
+            },
+                method = "POST",
+                url = 'https://localhost:7171/api/Clientes';
+
+            if (frmCliente.dataset.accion == "modificar") {
+                datos.idCliente = frmCliente.dataset.idcliente;
+                method = "PUT";
+                url = `https://localhost:7171/api/Clientes/${datos.idCliente}`;
+            }
+
+            const respuesta = await fetch(url, {
+                method,
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(datos)
+            });
+
+            if (!respuesta.ok) {
+                throw new Error(`Error: ${respuesta.status} ${respuesta.statusText}`);
+            }
+
+            const cliente = await respuesta.json();
+            if (cliente && cliente?.idCliente > 0) {
+                nuevoClientes();
+                listarClientes();
+            } else {
+                console.error('No se pudo guardar el cliente.');
+            }
+        } catch (error) {
+            console.error('Hubo un problema con la operación fetch:', error);
+        }
+    }
+
+    function modificarCliente(cliente) {
+        frmCliente.dataset.idcliente = cliente.idCliente;
+        frmCliente.dataset.accion = "modificar";
+        txtNombreCliente.value = cliente.nombre;
+        txtDuiCliente.value = cliente.dui;
+        txtEmailCliente.value = cliente.email;
+        txtTelefonoCliente.value = cliente.telefono;
+    }
+    function nuevoClientes() {
+        frmCliente.dataset.idcliente = "0";
+        frmCliente.dataset.accion = "nuevo";
+        txtNombreCliente.value = "";
+        txtDuiCliente.value = "";
+        txtEmailCliente.value = "";
+        txtTelefonoCliente.value = "";
+    }
+</script>

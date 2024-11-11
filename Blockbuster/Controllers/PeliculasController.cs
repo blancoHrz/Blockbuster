@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -22,16 +22,16 @@ namespace Blockbuster.Controllers
 
         // GET: api/Peliculas
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Pelicula>>> GetPelicula()
+        public async Task<ActionResult<IEnumerable<Pelicula>>> GetPeliculas()
         {
-            return await _context.Pelicula.ToListAsync();
+            return await _context.Peliculas.ToListAsync();
         }
 
         // GET: api/Peliculas/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Pelicula>> GetPelicula(int id)
         {
-            var pelicula = await _context.Pelicula.FindAsync(id);
+            var pelicula = await _context.Peliculas.FindAsync(id);
 
             if (pelicula == null)
             {
@@ -68,7 +68,7 @@ namespace Blockbuster.Controllers
                     throw;
                 }
             }
-            return CreatedAtAction("GetAlumno", new { id = pelicula.idPelicula }, pelicula);
+            return CreatedAtAction("GetPelicula", new { id = pelicula.idPelicula }, pelicula);
             //return NoContent();
         }
 
@@ -77,7 +77,7 @@ namespace Blockbuster.Controllers
         [HttpPost]
         public async Task<ActionResult<Pelicula>> PostPelicula(Pelicula pelicula)
         {
-            _context.Pelicula.Add(pelicula);
+            _context.Peliculas.Add(pelicula);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetPelicula", new { id = pelicula.idPelicula }, pelicula);
@@ -87,13 +87,13 @@ namespace Blockbuster.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeletePelicula(int id)
         {
-            var pelicula = await _context.Pelicula.FindAsync(id);
+            var pelicula = await _context.Peliculas.FindAsync(id);
             if (pelicula == null)
             {
                 return NotFound();
             }
 
-            _context.Pelicula.Remove(pelicula);
+            _context.Peliculas.Remove(pelicula);
             await _context.SaveChangesAsync();
 
             return NoContent();
@@ -101,7 +101,7 @@ namespace Blockbuster.Controllers
 
         private bool PeliculaExists(int id)
         {
-            return _context.Pelicula.Any(e => e.idPelicula == id);
+            return _context.Peliculas.Any(e => e.idPelicula == id);
         }
     }
 }

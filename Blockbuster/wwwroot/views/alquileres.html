@@ -1,0 +1,171 @@
+﻿<form id="frmAlquiler" data-idalquiler="0" data-accion="nuevo">
+    <div class="card text-bg-dark mb-3" style="width: 800px">
+        <div class="card-header">
+            <div class="d-flex">
+                Registro de Alquiler
+                <div class="ms-auto">
+                    <button type="button" data-form="alquileres" class="btn-close btn-close-white"></button>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <!-- Select para Cliente -->
+            <div class="row p-1">
+                <div class="col-3 col-md-2">CLIENTE:</div>
+                <div class="col-9 col-md-6">
+                    <select class="form-control" id="selectCliente" name="selectCliente" required>
+                        <option value="">Seleccione un cliente</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Select para Película -->
+            <div class="row p-1">
+                <div class="col-3 col-md-2">PELÍCULA:</div>
+                <div class="col-9 col-md-6">
+                    <select class="form-control" id="selectPelicula" name="selectPelicula" required>
+                        <option value="">Seleccione una película</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Fecha de Alquiler -->
+            <div class="row p-1">
+                <div class="col-3 col-md-2">FECHA DE ALQUILER:</div>
+                <div class="col-9 col-md-6">
+                    <input type="date" class="form-control" id="txtFechaAlquiler" name="txtFechaAlquiler" required />
+                </div>
+            </div>
+
+            <!-- Fecha de Devolución -->
+            <div class="row p-1">
+                <div class="col-3 col-md-2">FECHA DE DEVOLUCIÓN:</div>
+                <div class="col-9 col-md-6">
+                    <input type="date" class="form-control" id="txtFechaDevolucion" name="txtFechaDevolucion" required />
+                </div>
+            </div>
+
+            <div class="row p-1">
+                <div class="col-12 text-center">
+                    <input type="submit" class="btn btn-primary" value="Guardar" />
+                    <input type="reset" class="btn btn-warning" value="Nuevo" />
+                    <input type="button" onclick="abrirVentana('busqueda_')" class="btn btn-success" value="Buscar" />
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<script>
+    // Event listener para el formulario
+    frmAlquiler.addEventListener('submit', e => {
+        e.preventDefault();
+        guardarAlquileres();
+    });
+    frmAlquiler.addEventListener('reset', e => {
+        e.preventDefault();
+        nuevoAlquileres();
+    });
+
+    // Función para cargar clientes en el select
+    async function cargarClientes() {
+        try {
+            const response = await fetch('https://localhost:7171/api/Clientes');
+            const clientes = await response.json();
+
+            console.log('Clientes cargados:', clientes); // Verifica si los datos están llegando correctamente
+
+            const selectCliente = document.getElementById('selectCliente');
+            selectCliente.innerHTML = '<option value="">Seleccione un cliente</option>'; // Limpiar las opciones previas
+
+            clientes.forEach(cliente => {
+                const option = document.createElement('option');
+                option.value = cliente.idCliente;
+                option.textContent = cliente.nombre;
+                selectCliente.appendChild(option);
+            });
+        } catch (error) {
+            console.error('Error al cargar los clientes:', error);
+        }
+    }
+
+    // Función para cargar películas en el select
+    async function cargarPeliculas() {
+        try {
+            const response = await fetch('https://localhost:7171/api/Peliculas');
+            const peliculas = await response.json();
+
+            console.log('Películas cargadas:', peliculas); // Verifica si los datos están llegando correctamente
+
+            const selectPelicula = document.getElementById('selectPelicula');
+            selectPelicula.innerHTML = '<option value="">Seleccione una película</option>'; // Limpiar las opciones previas
+
+            peliculas.forEach(pelicula => {
+                const option = document.createElement('option');
+                option.value = pelicula.idPelicula;
+                option.textContent = pelicula.titulo;
+                selectPelicula.appendChild(option);
+            });
+        } catch (error) {
+            console.error('Error al cargar las películas:', error);
+        }
+    }
+
+    // Función para guardar o actualizar el alquiler
+    async function guardarAlquileres() {
+        try {
+            let datos = {
+                idCliente: document.getElementById('selectCliente').value,
+                idPelicula: document.getElementById('selectPelicula').value,
+                FechaAlquiler: document.getElementById('txtFechaAlquiler').value,
+                FechaDevolucion: document.getElementById('txtFechaDevolucion').value
+            },
+                method = "POST",
+                url = 'https://localhost:7171/api/Alquileres';
+
+            if (frmAlquiler.dataset.accion == "modificar") {
+                datos.idAlquiler = frmAlquiler.dataset.idalquiler;
+                method = "PUT";
+                url = `https://localhost:7171/api/Alquileres/${datos.idAlquiler}`;
+            }
+
+            const respuesta = await fetch(url, {
+                method,
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(datos)
+            });
+
+            if (!respuesta.ok) {
+                throw new Error(`Error: ${respuesta.status} ${respuesta.statusText}`);
+            }
+
+            const alquiler = await respuesta.json();
+            if (alquiler && alquiler?.idAlquiler > 0) {
+                nuevoAlquileres();
+                listarAlquileres();
+            } else {
+                console.error('No se pudo guardar el alquiler.');
+            }
+        } catch (error) {
+            console.error('Hubo un problema con la operación fetch:', error);
+        }
+    }
+
+    // Función para reiniciar el formulario
+    function nuevoAlquileres() {
+        frmAlquiler.dataset.idalquiler = "0";
+        frmAlquiler.dataset.accion = "nuevo";
+        document.getElementById('selectCliente').value = "";
+        document.getElementById('selectPelicula').value = "";
+        document.getElementById('txtFechaAlquiler').value = "";
+        document.getElementById('txtFechaDevolucion').value = "";
+    }
+
+    // Cargar los clientes y películas al iniciar la página
+    window.onload = function () {
+        cargarClientes();
+        cargarPeliculas();
+    };
+</script>
